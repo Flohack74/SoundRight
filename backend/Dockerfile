@@ -1,6 +1,6 @@
 # Backend Dockerfile for SoundRight
 
-FROM node:18-alpine
+FROM node:22-alpine
 
 # Set working directory
 WORKDIR /app

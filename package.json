@@ -3,18 +3,24 @@
   "version": "1.0.0",
   "description": "Sound equipment inventory management system",
   "main": "index.js",
+  "engines": {
+    "node": ">=22.0.0",
+    "npm": ">=10.0.0"
+  },
   "scripts": {
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "server": "cd backend && npm run dev",
     "client": "cd frontend && npm start",
     "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install",
     "build": "cd frontend && npm run build",
-    "start": "cd backend && npm start"
+    "start": "cd backend && npm start",
+    "clean": "rm -rf node_modules backend/node_modules frontend/node_modules backend/dist frontend/build",
+    "postinstall": "npm run install-all"
   },
   "keywords": ["sound", "equipment", "inventory", "management"],
   "author": "SoundRight Team",
   "license": "MIT",
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^9.1.0"
   }
 }

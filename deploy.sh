@@ -59,8 +59,8 @@ update_system() {
 }
 
 install_nodejs() {
-    print_status "Installing Node.js..."
-    curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+    print_status "Installing Node.js 22..."
+    curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
     apt-get install -y nodejs
     print_success "Node.js installed: $(node --version)"
 }

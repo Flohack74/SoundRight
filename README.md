@@ -23,36 +23,49 @@ SoundRight/
 
 ## Quick Start
 
-1. **Install Dependencies**
+1. **Check System Requirements**
+   ```bash
+   node check-node-version.js
+   ```
+
+2. **Install Dependencies**
    ```bash
    npm run install-all
    ```
 
-2. **Start Development Environment**
+3. **Start Development Environment**
    ```bash
    npm run dev
    ```
 
-3. **Access the Application**
+4. **Access the Application**
    - Frontend: http://localhost:3000
    - Backend API: http://localhost:5000
 
 ## Technology Stack
 
 ### Frontend
-- React 18
-- TypeScript
-- Material-UI (MUI)
-- React Router
-- Axios for API calls
+- React 18.3+
+- TypeScript 5.6+
+- Material-UI (MUI) 5.15+
+- React Router 6.26+
+- Axios 1.7+
 
 ### Backend
-- Node.js
-- Express.js
-- TypeScript
+- Node.js 22.x (LTS)
+- Express.js 4.19+
+- TypeScript 5.6+
 - SQLite (development) / PostgreSQL (production)
 - JWT Authentication
 - Multer for file uploads
+
+## System Requirements
+
+- **Node.js**: 22.0.0 or higher
+- **npm**: 10.0.0 or higher
+- **Memory**: 2GB RAM minimum (4GB recommended)
+- **Storage**: 1GB free space minimum
+- **Platform**: Linux, macOS, or Windows
 
 ## Development
 
