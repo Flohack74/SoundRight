@@ -25,7 +25,11 @@ const loginSchema = Joi.object({
 
 // Generate JWT token
 const generateToken = (id: number): string => {
-  return jwt.sign({ id }, process.env.JWT_SECRET!, {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error('JWT_SECRET is not defined');
+  }
+  return jwt.sign({ id }, secret, {
     expiresIn: process.env.JWT_EXPIRES_IN || '7d'
   });
 };
@@ -151,6 +155,10 @@ router.post('/login', asyncHandler(async (req: Request, res: Response, next: Nex
 // @route   GET /api/auth/me
 // @access  Private
 router.get('/me', protect, asyncHandler(async (req: AuthRequest, res: Response) => {
+  if (!req.user) {
+    throw new Error('User not authenticated');
+  }
+  
   const user = await new Promise<any>((resolve, reject) => {
     db.get(
       'SELECT id, username, email, first_name, last_name, role FROM users WHERE id = ?',
@@ -179,6 +187,10 @@ router.get('/me', protect, asyncHandler(async (req: AuthRequest, res: Response) 
 // @route   PUT /api/auth/updatepassword
 // @access  Private
 router.put('/updatepassword', protect, asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction) => {
+  if (!req.user) {
+    return next(createError('User not authenticated', 401));
+  }
+  
   const { currentPassword, newPassword } = req.body;
 
   if (!currentPassword || !newPassword) {
@@ -215,7 +227,7 @@ router.put('/updatepassword', protect, asyncHandler(async (req: AuthRequest, res
   await new Promise((resolve, reject) => {
     db.run(
       'UPDATE users SET password_hash = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
-      [passwordHash, req.user.id],
+      [passwordHash, req.user!.id],
       (err) => {
         if (err) reject(err);
         else resolve(null);
