@@ -25,13 +25,13 @@
     "web-vitals": "^4.2.4"
   },
   "overrides": {
-    "ajv": "^6.12.6",
-    "ajv-keywords": "^3.5.2",
+    "ajv": "^7.2.4",
+    "ajv-keywords": "^4.1.1",
     "ajv-formats": "^1.6.1"
   },
   "resolutions": {
-    "ajv": "^6.12.6",
-    "ajv-keywords": "^3.5.2",
+    "ajv": "^7.2.4",
+    "ajv-keywords": "^4.1.1",
     "ajv-formats": "^1.6.1"
   },
   "scripts": {
