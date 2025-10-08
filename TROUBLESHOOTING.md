@@ -111,6 +111,60 @@ npm install ajv-keywords@^5.1.0 --save-dev --legacy-peer-deps --force
 npm install ajv-formats@^2.1.1 --save-dev --legacy-peer-deps --force
 ```
 
+### 1d. FormatMinimum Keyword Error
+
+**Error Message:**
+```
+Error: Unknown keyword formatMinimum
+at /node_modules/ajv-keywords/dist/index.js:25
+```
+
+**Cause:** This error occurs when AJV doesn't recognize the `formatMinimum` keyword, which is a newer keyword not supported by older versions of ajv-keywords.
+
+**Solutions:**
+
+#### Option 1: Use the FormatMinimum Fix Script (Recommended)
+```bash
+node fix-formatminimum-error.js
+```
+
+#### Option 2: Clean Install with Compatible Versions
+```bash
+cd frontend
+rm -rf node_modules package-lock.json
+npm install --legacy-peer-deps --force
+```
+
+#### Option 3: Use Older AJV Versions
+```bash
+cd frontend
+npm uninstall ajv ajv-keywords ajv-formats
+npm install ajv@^6.12.6 --save-dev --legacy-peer-deps --force
+npm install ajv-keywords@^3.5.2 --save-dev --legacy-peer-deps --force
+npm install ajv-formats@^1.6.1 --save-dev --legacy-peer-deps --force
+```
+
+#### Option 4: Disable Format Validation
+```bash
+cd frontend
+# Create webpack.config.js to disable format validation
+echo 'module.exports = function override(config, env) {
+  config.module.rules.push({
+    test: /\.js$/,
+    include: /node_modules\/ajv-keywords/,
+    use: {
+      loader: "string-replace-loader",
+      options: {
+        search: "throw new Error(\"Unknown keyword \" + keyword);",
+        replace: "if (keyword === \"formatMinimum\") return; throw new Error(\"Unknown keyword \" + keyword);",
+        flags: "g"
+      }
+    }
+  });
+  return config;
+};' > webpack.config.js
+```
+
 ### 2. Node.js Version Compatibility
 
 **Error Message:**
