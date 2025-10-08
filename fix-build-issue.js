@@ -66,6 +66,18 @@ function fixAjvIssue() {
     return runCommand('npm install --legacy-peer-deps --force --no-optional', frontendDir);
   }
   
+  // Fix AJV keywords issue specifically
+  log('Fixing AJV keywords compatibility...', 'blue');
+  try {
+    const ajvKeywordsPath = path.join(frontendDir, 'node_modules', 'ajv-keywords');
+    if (fs.existsSync(ajvKeywordsPath)) {
+      // Try to install compatible versions
+      runCommand('npm install ajv-keywords@^5.1.0 --save-dev --legacy-peer-deps --force', frontendDir);
+    }
+  } catch (error) {
+    log('⚠️  Could not fix AJV keywords automatically', 'yellow');
+  }
+  
   return installSuccess;
 }
 

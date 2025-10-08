@@ -40,6 +40,77 @@ rm -rf node_modules package-lock.json
 npm install --legacy-peer-deps
 ```
 
+### 1b. AJV Module Not Found Error
+
+**Error Message:**
+```
+Error: Cannot find module 'ajv/dist/compile/codegen'
+```
+
+**Cause:** This is a common issue with Node.js 22 and react-scripts 5.0.1 due to dependency resolution conflicts.
+
+**Solutions:**
+
+#### Option 1: Use the Fix Script (Recommended)
+```bash
+node fix-build-issue.js
+```
+
+#### Option 2: Manual Fix
+```bash
+cd frontend
+rm -rf node_modules package-lock.json
+npm install --legacy-peer-deps --force
+NODE_OPTIONS="--openssl-legacy-provider" npm run build
+```
+
+#### Option 3: Set Environment Variables
+```bash
+cd frontend
+echo "NODE_OPTIONS=--openssl-legacy-provider" > .env
+echo "GENERATE_SOURCEMAP=false" >> .env
+npm run build
+```
+
+### 1c. AJV Keywords Format Error
+
+**Error Message:**
+```
+TypeError: Cannot read properties of undefined (reading 'date')
+at _formatLimit.js:63
+```
+
+**Cause:** This is a compatibility issue between `ajv-keywords` and Node.js 22, where the `formats` object is undefined.
+
+**Solutions:**
+
+#### Option 1: Use the AJV Keywords Fix Script (Recommended)
+```bash
+node fix-ajv-keywords.js
+```
+
+#### Option 2: Manual Patch
+```bash
+cd frontend
+# Find and patch the problematic file
+find node_modules -name "_formatLimit.js" -path "*/ajv-keywords/*" -exec sed -i 's/var format = formats\[name\];/var format = formats \&\& formats[name];/g' {} \;
+```
+
+#### Option 3: Clean Install with Overrides
+```bash
+cd frontend
+rm -rf node_modules package-lock.json
+npm install --legacy-peer-deps --force
+```
+
+#### Option 4: Use Different AJV Versions
+```bash
+cd frontend
+npm uninstall ajv-keywords
+npm install ajv-keywords@^5.1.0 --save-dev --legacy-peer-deps --force
+npm install ajv-formats@^2.1.1 --save-dev --legacy-peer-deps --force
+```
+
 ### 2. Node.js Version Compatibility
 
 **Error Message:**
