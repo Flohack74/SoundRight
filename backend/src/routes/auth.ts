@@ -1,8 +1,8 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { db } from '../database/init';
-import { protect } from '../middleware/auth';
+import { protect, AuthRequest } from '../middleware/auth';
 import { asyncHandler, createError } from '../middleware/errorHandler';
 import Joi from 'joi';
 
@@ -24,7 +24,7 @@ const loginSchema = Joi.object({
 });
 
 // Generate JWT token
-const generateToken = (id: number) => {
+const generateToken = (id: number): string => {
   return jwt.sign({ id }, process.env.JWT_SECRET!, {
     expiresIn: process.env.JWT_EXPIRES_IN || '7d'
   });
@@ -33,7 +33,7 @@ const generateToken = (id: number) => {
 // @desc    Register user
 // @route   POST /api/auth/register
 // @access  Public
-router.post('/register', asyncHandler(async (req, res, next) => {
+router.post('/register', asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
   const { error, value } = registerSchema.validate(req.body);
   if (error) {
     return next(createError(error.details[0].message, 400));
@@ -103,7 +103,7 @@ router.post('/register', asyncHandler(async (req, res, next) => {
 // @desc    Login user
 // @route   POST /api/auth/login
 // @access  Public
-router.post('/login', asyncHandler(async (req, res, next) => {
+router.post('/login', asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
   const { error, value } = loginSchema.validate(req.body);
   if (error) {
     return next(createError(error.details[0].message, 400));
@@ -150,7 +150,7 @@ router.post('/login', asyncHandler(async (req, res, next) => {
 // @desc    Get current logged in user
 // @route   GET /api/auth/me
 // @access  Private
-router.get('/me', protect, asyncHandler(async (req: any, res) => {
+router.get('/me', protect, asyncHandler(async (req: AuthRequest, res: Response) => {
   const user = await new Promise<any>((resolve, reject) => {
     db.get(
       'SELECT id, username, email, first_name, last_name, role FROM users WHERE id = ?',
@@ -178,7 +178,7 @@ router.get('/me', protect, asyncHandler(async (req: any, res) => {
 // @desc    Update password
 // @route   PUT /api/auth/updatepassword
 // @access  Private
-router.put('/updatepassword', protect, asyncHandler(async (req: any, res, next) => {
+router.put('/updatepassword', protect, asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction) => {
   const { currentPassword, newPassword } = req.body;
 
   if (!currentPassword || !newPassword) {
