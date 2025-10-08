@@ -32,6 +32,8 @@ SoundRight/
    ```bash
    npm run install-all
    ```
+   
+   **Note:** If you encounter TypeScript/React-Scripts compatibility errors, the installation will automatically use `--legacy-peer-deps` for the frontend. This is normal and expected.
 
 3. **Start Development Environment**
    ```bash
