@@ -425,6 +425,44 @@ echo "TSC_COMPILE_ON_ERROR=true" >> .env
 npm run build
 ```
 
+### 1j. Terser Not Found Error (Vite)
+
+**Error Message:**
+```
+[vite:terser] terser not found. Since Vite v3, terser has become an optional dependency. You need to install it.
+```
+
+**Cause:** Vite v3+ made terser an optional dependency, so it needs to be installed separately.
+
+**Solutions:**
+
+#### Option 1: Use the Terser Fix Script (Recommended)
+```bash
+node fix-terser-issue.js
+```
+
+#### Option 2: Install Terser Manually
+```bash
+cd frontend
+npm install terser --save-dev
+npm run build
+```
+
+#### Option 3: Use esbuild Instead (Faster)
+```bash
+cd frontend
+# Update vite.config.js to use esbuild instead of terser
+# Change: minify: 'terser' to minify: 'esbuild'
+npm run build
+```
+
+#### Option 4: Install All Dependencies
+```bash
+cd frontend
+npm install
+npm run build
+```
+
 ### 2. Node.js Version Compatibility
 
 **Error Message:**
