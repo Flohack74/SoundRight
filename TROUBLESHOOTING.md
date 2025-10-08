@@ -165,6 +165,161 @@ echo 'module.exports = function override(config, env) {
 };' > webpack.config.js
 ```
 
+### 1e. AJV Context Module Error
+
+**Error Message:**
+```
+Error: Cannot find module 'ajv/dist/compile/context'
+```
+
+**Cause:** This error occurs when there's a mismatch between AJV versions and the module structure they expect.
+
+**Solutions:**
+
+#### Option 1: Use the Complete AJV Fix Script (Recommended)
+```bash
+node fix-ajv-complete.js
+```
+
+#### Option 2: Clean Install with Compatible Versions
+```bash
+cd frontend
+rm -rf node_modules package-lock.json
+npm install --legacy-peer-deps --force
+```
+
+#### Option 3: Install Specific AJV Versions
+```bash
+cd frontend
+npm uninstall ajv ajv-keywords ajv-formats
+npm install ajv@^7.2.4 --save-dev --legacy-peer-deps --force
+npm install ajv-keywords@^4.1.1 --save-dev --legacy-peer-deps --force
+npm install ajv-formats@^1.6.1 --save-dev --legacy-peer-deps --force
+```
+
+#### Option 4: Use Webpack Override
+```bash
+cd frontend
+# Create webpack.config.js with AJV module resolution
+echo 'const path = require("path");
+module.exports = function override(config, env) {
+  config.resolve.alias = {
+    ...config.resolve.alias,
+    "ajv/dist/compile/context": path.resolve(__dirname, "node_modules/ajv/dist/compile/context.js"),
+    "ajv/dist/compile/codegen": path.resolve(__dirname, "node_modules/ajv/dist/compile/codegen.js")
+  };
+  return config;
+};' > webpack.config.js
+```
+
+### 1f. Date-fns Export Path Error
+
+**Error Message:**
+```
+Module not found: Error: Package path ./_lib/format/longFormatters is not exported from package date-fns
+```
+
+**Cause:** This error occurs when using date-fns v4.x with MUI date pickers, as v4.x has a different export structure than what MUI expects.
+
+**Solutions:**
+
+#### Option 1: Use the Date-fns Fix Script (Recommended)
+```bash
+node fix-date-fns-error.js
+```
+
+#### Option 2: Install Compatible Date-fns Version
+```bash
+cd frontend
+npm uninstall date-fns
+npm install date-fns@^2.30.0 --save --legacy-peer-deps --force
+```
+
+#### Option 3: Clean Install with Override
+```bash
+cd frontend
+rm -rf node_modules package-lock.json
+npm install --legacy-peer-deps --force
+```
+
+#### Option 4: Use Webpack Alias
+```bash
+cd frontend
+# Create or update webpack.config.js with date-fns alias
+echo 'const path = require("path");
+module.exports = function override(config, env) {
+  config.resolve.alias = {
+    ...config.resolve.alias,
+    "date-fns/_lib/format/longFormatters": path.resolve(__dirname, "node_modules/date-fns/esm/_lib/format/longFormatters.js")
+  };
+  return config;
+};' > webpack.config.js
+```
+
+### 1g. ESLint Configuration Error
+
+**Error Message:**
+```
+[eslint] Error while loading rule '@typescript-eslint/no-floating-promises': You have used a rule which requires parserServices to be generated. You must therefore provide a value for the "parserOptions.project" property for @typescript-eslint/parser.
+```
+
+**Cause:** This error occurs when ESLint TypeScript rules require project information but the parser options are not properly configured.
+
+**Solutions:**
+
+#### Option 1: Use the ESLint Config Fix Script (Recommended)
+```bash
+node fix-eslint-config.js
+```
+
+#### Option 2: Update ESLint Configuration Manually
+```bash
+# Frontend
+cd frontend
+echo 'module.exports = {
+  extends: ["react-app", "react-app/jest"],
+  parserOptions: {
+    ecmaVersion: 2022,
+    sourceType: "module",
+    project: "./tsconfig.json",
+  },
+  rules: {
+    "@typescript-eslint/no-floating-promises": "off",
+    "@typescript-eslint/await-thenable": "off",
+  },
+};' > .eslintrc.js
+
+# Backend
+cd backend
+echo 'module.exports = {
+  parser: "@typescript-eslint/parser",
+  parserOptions: {
+    ecmaVersion: 2022,
+    sourceType: "module",
+    project: "./tsconfig.json",
+  },
+  extends: ["@typescript-eslint/recommended"],
+  rules: {
+    "@typescript-eslint/no-floating-promises": "warn",
+    "@typescript-eslint/await-thenable": "warn",
+  },
+};' > .eslintrc.js
+```
+
+#### Option 3: Disable Problematic Rules
+```bash
+cd frontend
+# Add to package.json scripts
+npm pkg set scripts.lint="eslint src --ext .ts,.tsx --max-warnings 0"
+```
+
+#### Option 4: Skip ESLint During Build
+```bash
+cd frontend
+echo "ESLINT_NO_DEV_ERRORS=true" >> .env
+echo "DISABLE_ESLINT_PLUGIN=true" >> .env
+```
+
 ### 2. Node.js Version Compatibility
 
 **Error Message:**
