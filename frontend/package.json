@@ -15,30 +15,38 @@
     "@mui/x-data-grid": "^7.17.1",
     "@mui/x-date-pickers": "^7.17.1",
     "axios": "^1.7.7",
-    "date-fns": "^4.1.0",
+    "date-fns": "^2.30.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.26.2",
-    "react-scripts": "5.0.1",
     "recharts": "^2.12.7",
     "typescript": "^4.9.5",
     "web-vitals": "^4.2.4"
   },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@typescript-eslint/eslint-plugin": "^8.7.0",
+    "@typescript-eslint/parser": "^8.7.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "eslint": "^9.10.0",
+    "vite": "^5.4.8"
+  },
   "overrides": {
-    "ajv": "^7.2.4",
-    "ajv-keywords": "^4.1.1",
-    "ajv-formats": "^1.6.1"
+    "ajv": "^8.16.0",
+    "date-fns": "^2.30.0"
   },
   "resolutions": {
-    "ajv": "^7.2.4",
-    "ajv-keywords": "^4.1.1",
-    "ajv-formats": "^1.6.1"
+    "ajv": "^8.16.0",
+    "date-fns": "^2.30.0"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
+    "start": "vite",
+    "dev": "vite",
+    "build": "vite build",
+    "build:dev": "vite build --mode development",
+    "preview": "vite preview",
+    "test": "vitest",
     "lint": "eslint src/**/*.{ts,tsx}",
     "lint:fix": "eslint src/**/*.{ts,tsx} --fix"
   },

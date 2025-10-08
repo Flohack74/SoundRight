@@ -320,6 +320,111 @@ echo "ESLINT_NO_DEV_ERRORS=true" >> .env
 echo "DISABLE_ESLINT_PLUGIN=true" >> .env
 ```
 
+### 1h. JavaScript Heap Out of Memory Error
+
+**Error Message:**
+```
+FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory
+```
+
+**Cause:** This error occurs when the Node.js process runs out of memory during the build process, typically due to large bundles or memory leaks.
+
+**Solutions:**
+
+#### Option 1: Use the Memory Fix Script (Recommended)
+```bash
+node fix-memory-issue.js
+```
+
+#### Option 2: Increase Node.js Memory Limit
+```bash
+cd frontend
+NODE_OPTIONS="--max-old-space-size=8192" npm run build
+```
+
+#### Option 3: Use Optimized Build Script
+```bash
+cd frontend
+npm run build:dev
+```
+
+#### Option 4: Disable Source Maps
+```bash
+cd frontend
+echo "GENERATE_SOURCEMAP=false" >> .env
+echo "INLINE_RUNTIME_CHUNK=false" >> .env
+npm run build
+```
+
+#### Option 5: Clean Build
+```bash
+cd frontend
+rm -rf build node_modules/.cache
+NODE_OPTIONS="--max-old-space-size=8192" npm run build
+```
+
+#### Option 6: System-Level Solutions
+```bash
+# Increase swap space (Linux/macOS)
+sudo swapoff -a
+sudo dd if=/dev/zero of=/swapfile bs=1M count=8192
+sudo mkswap /swapfile
+sudo swapon /swapfile
+
+# Or use a machine with more RAM (8GB+ recommended)
+```
+
+### 1i. Memory Issues on High-RAM Systems (16GB+)
+
+**Symptoms:** Memory errors even on systems with 16GB+ RAM
+
+**Cause:** Memory leaks in build process, inefficient webpack configuration, or circular dependencies
+
+**Solutions:**
+
+#### Option 1: Use the Memory Leak Fix Script (Recommended)
+```bash
+node fix-memory-leak.js
+```
+
+#### Option 2: Use Minimal Build Configuration
+```bash
+cd frontend
+npm run build:minimal
+```
+
+#### Option 3: Aggressive Memory Optimization
+```bash
+cd frontend
+NODE_OPTIONS="--max-old-space-size=12288 --optimize-for-size --gc-interval=100" npm run build
+```
+
+#### Option 4: Switch to Vite (Alternative Build Tool)
+```bash
+cd frontend
+npm install vite @vitejs/plugin-react --save-dev
+# Update package.json scripts to use Vite instead of react-scripts
+npm run build
+```
+
+#### Option 5: Check for Circular Dependencies
+```bash
+cd frontend
+npm install madge --save-dev
+npx madge --circular --extensions ts,tsx src/
+```
+
+#### Option 6: Disable All Optimizations
+```bash
+cd frontend
+echo "GENERATE_SOURCEMAP=false" > .env
+echo "INLINE_RUNTIME_CHUNK=false" >> .env
+echo "ESLINT_NO_DEV_ERRORS=true" >> .env
+echo "SKIP_PREFLIGHT_CHECK=true" >> .env
+echo "TSC_COMPILE_ON_ERROR=true" >> .env
+npm run build
+```
+
 ### 2. Node.js Version Compatibility
 
 **Error Message:**
