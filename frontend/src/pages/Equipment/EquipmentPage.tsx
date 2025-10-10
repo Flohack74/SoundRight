@@ -33,6 +33,8 @@ import { useSnackbar } from '../../contexts/SnackbarContext';
 import { equipmentService } from '../../services/equipmentService';
 import { Equipment, EquipmentFilters } from '../../types/equipment';
 import LoadingSpinner from '../../components/Common/LoadingSpinner';
+import EquipmentFormDialog from '../../components/Equipment/EquipmentFormDialog';
+import EquipmentDetailsDialog from '../../components/Equipment/EquipmentDetailsDialog';
 
 const EquipmentPage: React.FC = () => {
   const [equipment, setEquipment] = useState<Equipment[]>([]);
@@ -47,6 +49,9 @@ const EquipmentPage: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedEquipment, setSelectedEquipment] = useState<Equipment | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [formDialogOpen, setFormDialogOpen] = useState(false);
+  const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
+  const [editingEquipment, setEditingEquipment] = useState<Equipment | null>(null);
 
   const { showSuccess, showError } = useSnackbar();
 
@@ -101,7 +106,37 @@ const EquipmentPage: React.FC = () => {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
-    setSelectedEquipment(null);
+  };
+
+  const handleAddClick = () => {
+    setEditingEquipment(null);
+    setFormDialogOpen(true);
+  };
+
+  const handleEditClick = () => {
+    if (selectedEquipment) {
+      setEditingEquipment(selectedEquipment);
+      setFormDialogOpen(true);
+    }
+    handleMenuClose();
+  };
+
+  const handleViewDetails = () => {
+    setDetailsDialogOpen(true);
+    handleMenuClose();
+  };
+
+  const handleFormSuccess = () => {
+    fetchEquipment();
+  };
+
+  const handleFormClose = () => {
+    setFormDialogOpen(false);
+    setEditingEquipment(null);
+  };
+
+  const handleDetailsClose = () => {
+    setDetailsDialogOpen(false);
   };
 
   const handleDelete = async () => {
@@ -143,10 +178,7 @@ const EquipmentPage: React.FC = () => {
         <Button
           variant="contained"
           startIcon={<Add />}
-          onClick={() => {
-            // TODO: Open equipment form
-            showSuccess('Add equipment functionality coming soon!');
-          }}
+          onClick={handleAddClick}
         >
           Add Equipment
         </Button>
@@ -310,11 +342,11 @@ const EquipmentPage: React.FC = () => {
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
       >
-        <MenuItem onClick={handleMenuClose}>
+        <MenuItem onClick={handleViewDetails}>
           <Visibility sx={{ mr: 1 }} />
           View Details
         </MenuItem>
-        <MenuItem onClick={handleMenuClose}>
+        <MenuItem onClick={handleEditClick}>
           <Edit sx={{ mr: 1 }} />
           Edit
         </MenuItem>
@@ -350,6 +382,21 @@ const EquipmentPage: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Equipment Form Dialog */}
+      <EquipmentFormDialog
+        open={formDialogOpen}
+        onClose={handleFormClose}
+        onSuccess={handleFormSuccess}
+        equipment={editingEquipment}
+      />
+
+      {/* Equipment Details Dialog */}
+      <EquipmentDetailsDialog
+        open={detailsDialogOpen}
+        onClose={handleDetailsClose}
+        equipment={selectedEquipment}
+      />
     </Box>
   );
 };
