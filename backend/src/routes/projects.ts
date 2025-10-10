@@ -1,6 +1,6 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import { db } from '../database/init';
-import { protect, authorize } from '../middleware/auth';
+import { protect, authorize, AuthRequest } from '../middleware/auth';
 import { asyncHandler, createError } from '../middleware/errorHandler';
 import Joi from 'joi';
 
@@ -30,7 +30,7 @@ const allocateEquipmentSchema = Joi.object({
 // @desc    Get all projects
 // @route   GET /api/projects
 // @access  Private
-router.get('/', protect, asyncHandler(async (req, res) => {
+router.get('/', protect, asyncHandler(async (req: AuthRequest, res: Response) => {
   const { page = 1, limit = 10, status, search } = req.query;
   const offset = (Number(page) - 1) * Number(limit);
 
@@ -93,7 +93,7 @@ router.get('/', protect, asyncHandler(async (req, res) => {
 // @desc    Get single project
 // @route   GET /api/projects/:id
 // @access  Private
-router.get('/:id', protect, asyncHandler(async (req, res, next) => {
+router.get('/:id', protect, asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction) => {
   const project = await new Promise<any>((resolve, reject) => {
     db.get(
       `SELECT p.*, u.first_name || ' ' || u.last_name as created_by_name 
@@ -121,7 +121,7 @@ router.get('/:id', protect, asyncHandler(async (req, res, next) => {
 // @desc    Create project
 // @route   POST /api/projects
 // @access  Private
-router.post('/', protect, asyncHandler(async (req, res, next) => {
+router.post('/', protect, asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction) => {
   const { error, value } = projectSchema.validate(req.body);
   if (error) {
     return next(createError(error.details[0].message, 400));
@@ -145,7 +145,7 @@ router.post('/', protect, asyncHandler(async (req, res, next) => {
       [
         name, clientName, clientEmail || null, clientPhone || null, clientAddress || null,
         description || null, startDate, endDate, status, location || null,
-        notes || null, req.user.id
+        notes || null, req.user!.id
       ],
       function(err) {
         if (err) reject(err);
@@ -178,7 +178,7 @@ router.post('/', protect, asyncHandler(async (req, res, next) => {
 // @desc    Update project
 // @route   PUT /api/projects/:id
 // @access  Private
-router.put('/:id', protect, asyncHandler(async (req, res, next) => {
+router.put('/:id', protect, asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction) => {
   const { error, value } = projectSchema.validate(req.body);
   if (error) {
     return next(createError(error.details[0].message, 400));
@@ -201,7 +201,7 @@ router.put('/:id', protect, asyncHandler(async (req, res, next) => {
   }
 
   // Check if user can modify this project (creator or admin/manager)
-  if (existing.created_by !== req.user.id && !['admin', 'manager'].includes(req.user.role)) {
+  if (existing.created_by !== req.user!.id && !['admin', 'manager'].includes(req.user!.role)) {
     return next(createError('Not authorized to modify this project', 403));
   }
 
@@ -257,7 +257,7 @@ router.put('/:id', protect, asyncHandler(async (req, res, next) => {
 // @desc    Delete project
 // @route   DELETE /api/projects/:id
 // @access  Private (Admin/Manager only)
-router.delete('/:id', protect, authorize('admin', 'manager'), asyncHandler(async (req, res, next) => {
+router.delete('/:id', protect, authorize('admin', 'manager'), asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
   // Check if project exists
   const existing = await new Promise<any>((resolve, reject) => {
     db.get(
@@ -294,7 +294,7 @@ router.delete('/:id', protect, authorize('admin', 'manager'), asyncHandler(async
 // @desc    Get project equipment
 // @route   GET /api/projects/:id/equipment
 // @access  Private
-router.get('/:id/equipment', protect, asyncHandler(async (req, res, next) => {
+router.get('/:id/equipment', protect, asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
   // Check if project exists
   const project = await new Promise<any>((resolve, reject) => {
     db.get(
@@ -336,7 +336,7 @@ router.get('/:id/equipment', protect, asyncHandler(async (req, res, next) => {
 // @desc    Allocate equipment to project
 // @route   POST /api/projects/:id/equipment
 // @access  Private
-router.post('/:id/equipment', protect, asyncHandler(async (req, res, next) => {
+router.post('/:id/equipment', protect, asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
   const { error, value } = allocateEquipmentSchema.validate(req.body);
   if (error) {
     return next(createError(error.details[0].message, 400));
@@ -448,7 +448,7 @@ router.post('/:id/equipment', protect, asyncHandler(async (req, res, next) => {
 // @desc    Return equipment from project
 // @route   PUT /api/projects/:id/equipment/:equipmentId
 // @access  Private
-router.put('/:id/equipment/:equipmentId', protect, asyncHandler(async (req, res, next) => {
+router.put('/:id/equipment/:equipmentId', protect, asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
   // Check if allocation exists
   const allocation = await new Promise<any>((resolve, reject) => {
     db.get(

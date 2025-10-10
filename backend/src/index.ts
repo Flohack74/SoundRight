@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import rateLimit from 'express-rate-limit';
+import path from 'path';
 
 import { initializeDatabase } from './database/init';
 import { errorHandler } from './middleware/errorHandler';
@@ -18,11 +19,15 @@ import deliveryRoutes from './routes/delivery';
 import invoiceRoutes from './routes/invoices';
 import userRoutes from './routes/users';
 
-// Load environment variables
-dotenv.config();
+// Load environment variables from backend directory
+// This works whether running from src (dev) or dist (production)
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Trust proxy - required when behind nginx/apache
+app.set('trust proxy', 1);
 
 // Rate limiting
 const limiter = rateLimit({

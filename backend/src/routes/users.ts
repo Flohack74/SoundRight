@@ -1,6 +1,6 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import { db } from '../database/init';
-import { protect, authorize } from '../middleware/auth';
+import { protect, authorize, AuthRequest } from '../middleware/auth';
 import { asyncHandler, createError } from '../middleware/errorHandler';
 import Joi from 'joi';
 
@@ -19,7 +19,7 @@ const updateUserSchema = Joi.object({
 // @desc    Get all users
 // @route   GET /api/users
 // @access  Private (Admin/Manager only)
-router.get('/', protect, authorize('admin', 'manager'), asyncHandler(async (req, res) => {
+router.get('/', protect, authorize('admin', 'manager'), asyncHandler(async (req: Request, res: Response) => {
   const { page = 1, limit = 10, role, active, search } = req.query;
   const offset = (Number(page) - 1) * Number(limit);
 
@@ -90,7 +90,7 @@ router.get('/', protect, authorize('admin', 'manager'), asyncHandler(async (req,
 // @desc    Get single user
 // @route   GET /api/users/:id
 // @access  Private (Admin/Manager only)
-router.get('/:id', protect, authorize('admin', 'manager'), asyncHandler(async (req, res, next) => {
+router.get('/:id', protect, authorize('admin', 'manager'), asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
   const user = await new Promise<any>((resolve, reject) => {
     db.get(
       'SELECT id, username, email, first_name, last_name, role, is_active, created_at, updated_at FROM users WHERE id = ?',
@@ -120,7 +120,7 @@ router.get('/:id', protect, authorize('admin', 'manager'), asyncHandler(async (r
 // @desc    Update user
 // @route   PUT /api/users/:id
 // @access  Private (Admin/Manager only)
-router.put('/:id', protect, authorize('admin', 'manager'), asyncHandler(async (req, res, next) => {
+router.put('/:id', protect, authorize('admin', 'manager'), asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
   const { error, value } = updateUserSchema.validate(req.body);
   if (error) {
     return next(createError(error.details[0].message, 400));
@@ -249,7 +249,7 @@ router.put('/:id', protect, authorize('admin', 'manager'), asyncHandler(async (r
 // @desc    Delete user
 // @route   DELETE /api/users/:id
 // @access  Private (Admin only)
-router.delete('/:id', protect, authorize('admin'), asyncHandler(async (req, res, next) => {
+router.delete('/:id', protect, authorize('admin'), asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction) => {
   // Check if user exists
   const existing = await new Promise<any>((resolve, reject) => {
     db.get(
@@ -267,7 +267,7 @@ router.delete('/:id', protect, authorize('admin'), asyncHandler(async (req, res,
   }
 
   // Don't allow deleting the current user
-  if (existing.id === req.user.id) {
+  if (existing.id === req.user!.id) {
     return next(createError('Cannot delete your own account', 400));
   }
 
@@ -291,7 +291,7 @@ router.delete('/:id', protect, authorize('admin'), asyncHandler(async (req, res,
 // @desc    Get user statistics
 // @route   GET /api/users/stats
 // @access  Private (Admin/Manager only)
-router.get('/meta/stats', protect, authorize('admin', 'manager'), asyncHandler(async (req, res) => {
+router.get('/meta/stats', protect, authorize('admin', 'manager'), asyncHandler(async (req: Request, res: Response) => {
   const stats = await new Promise<any>((resolve, reject) => {
     db.get(
       `SELECT 

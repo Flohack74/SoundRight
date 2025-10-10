@@ -46,7 +46,7 @@ export default defineConfig({
     host: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
+        target: 'https://soundright.kiloherzz.at',
         changeOrigin: true,
         secure: false,
       },

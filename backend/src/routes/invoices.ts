@@ -1,6 +1,6 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import { db } from '../database/init';
-import { protect, authorize } from '../middleware/auth';
+import { protect, authorize, AuthRequest } from '../middleware/auth';
 import { asyncHandler, createError } from '../middleware/errorHandler';
 import Joi from 'joi';
 
@@ -48,7 +48,7 @@ const generateInvoiceNumber = async (): Promise<string> => {
 // @desc    Get all invoices
 // @route   GET /api/invoices
 // @access  Private
-router.get('/', protect, asyncHandler(async (req, res) => {
+router.get('/', protect, asyncHandler(async (req: AuthRequest, res: Response) => {
   const { page = 1, limit = 10, status, search } = req.query;
   const offset = (Number(page) - 1) * Number(limit);
 
@@ -113,7 +113,7 @@ router.get('/', protect, asyncHandler(async (req, res) => {
 // @desc    Get single invoice
 // @route   GET /api/invoices/:id
 // @access  Private
-router.get('/:id', protect, asyncHandler(async (req, res, next) => {
+router.get('/:id', protect, asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction) => {
   const invoice = await new Promise<any>((resolve, reject) => {
     db.get(
       `SELECT i.*, p.name as project_name, q.quote_number, u.first_name || ' ' || u.last_name as created_by_name 
@@ -162,7 +162,7 @@ router.get('/:id', protect, asyncHandler(async (req, res, next) => {
 // @desc    Create invoice
 // @route   POST /api/invoices
 // @access  Private
-router.post('/', protect, asyncHandler(async (req, res, next) => {
+router.post('/', protect, asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction) => {
   const { error, value } = invoiceSchema.validate(req.body);
   if (error) {
     return next(createError(error.details[0].message, 400));
@@ -220,7 +220,7 @@ router.post('/', protect, asyncHandler(async (req, res, next) => {
       [
         invoiceNumber, projectId || null, quoteId || null, clientName, clientEmail || null,
         clientPhone || null, clientAddress || null, invoiceDate, dueDate || null, taxRate,
-        status, paymentTerms || null, notes || null, req.user.id
+        status, paymentTerms || null, notes || null, req.user!.id
       ],
       function(err) {
         if (err) reject(err);
@@ -255,7 +255,7 @@ router.post('/', protect, asyncHandler(async (req, res, next) => {
 // @desc    Update invoice
 // @route   PUT /api/invoices/:id
 // @access  Private
-router.put('/:id', protect, asyncHandler(async (req, res, next) => {
+router.put('/:id', protect, asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction) => {
   const { error, value } = invoiceSchema.validate(req.body);
   if (error) {
     return next(createError(error.details[0].message, 400));
@@ -278,7 +278,7 @@ router.put('/:id', protect, asyncHandler(async (req, res, next) => {
   }
 
   // Check if user can modify this invoice
-  if (existing.created_by !== req.user.id && !['admin', 'manager'].includes(req.user.role)) {
+  if (existing.created_by !== req.user!.id && !['admin', 'manager'].includes(req.user!.role)) {
     return next(createError('Not authorized to modify this invoice', 403));
   }
 
@@ -340,7 +340,7 @@ router.put('/:id', protect, asyncHandler(async (req, res, next) => {
 // @desc    Delete invoice
 // @route   DELETE /api/invoices/:id
 // @access  Private (Admin/Manager only)
-router.delete('/:id', protect, authorize('admin', 'manager'), asyncHandler(async (req, res, next) => {
+router.delete('/:id', protect, authorize('admin', 'manager'), asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction) => {
   // Check if invoice exists
   const existing = await new Promise<any>((resolve, reject) => {
     db.get(
@@ -377,7 +377,7 @@ router.delete('/:id', protect, authorize('admin', 'manager'), asyncHandler(async
 // @desc    Add item to invoice
 // @route   POST /api/invoices/:id/items
 // @access  Private
-router.post('/:id/items', protect, asyncHandler(async (req, res, next) => {
+router.post('/:id/items', protect, asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction) => {
   const { error, value } = invoiceItemSchema.validate(req.body);
   if (error) {
     return next(createError(error.details[0].message, 400));

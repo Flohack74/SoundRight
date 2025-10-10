@@ -1,6 +1,6 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import { db } from '../database/init';
-import { protect, authorize } from '../middleware/auth';
+import { protect, authorize, AuthRequest } from '../middleware/auth';
 import { asyncHandler, createError } from '../middleware/errorHandler';
 import Joi from 'joi';
 
@@ -47,7 +47,7 @@ const generateQuoteNumber = async (): Promise<string> => {
 // @desc    Get all quotes
 // @route   GET /api/quotes
 // @access  Private
-router.get('/', protect, asyncHandler(async (req, res) => {
+router.get('/', protect, asyncHandler(async (req: AuthRequest, res: Response) => {
   const { page = 1, limit = 10, status, search } = req.query;
   const offset = (Number(page) - 1) * Number(limit);
 
@@ -111,7 +111,7 @@ router.get('/', protect, asyncHandler(async (req, res) => {
 // @desc    Get single quote
 // @route   GET /api/quotes/:id
 // @access  Private
-router.get('/:id', protect, asyncHandler(async (req, res, next) => {
+router.get('/:id', protect, asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction) => {
   const quote = await new Promise<any>((resolve, reject) => {
     db.get(
       `SELECT q.*, p.name as project_name, u.first_name || ' ' || u.last_name as created_by_name 
@@ -159,7 +159,7 @@ router.get('/:id', protect, asyncHandler(async (req, res, next) => {
 // @desc    Create quote
 // @route   POST /api/quotes
 // @access  Private
-router.post('/', protect, asyncHandler(async (req, res, next) => {
+router.post('/', protect, asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction) => {
   const { error, value } = quoteSchema.validate(req.body);
   if (error) {
     return next(createError(error.details[0].message, 400));
@@ -199,7 +199,7 @@ router.post('/', protect, asyncHandler(async (req, res, next) => {
       [
         quoteNumber, projectId || null, clientName, clientEmail || null, clientPhone || null,
         clientAddress || null, quoteDate, validUntil || null, taxRate, status, notes || null,
-        termsConditions || null, req.user.id
+        termsConditions || null, req.user!.id
       ],
       function(err) {
         if (err) reject(err);
@@ -233,7 +233,7 @@ router.post('/', protect, asyncHandler(async (req, res, next) => {
 // @desc    Update quote
 // @route   PUT /api/quotes/:id
 // @access  Private
-router.put('/:id', protect, asyncHandler(async (req, res, next) => {
+router.put('/:id', protect, asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction) => {
   const { error, value } = quoteSchema.validate(req.body);
   if (error) {
     return next(createError(error.details[0].message, 400));
@@ -256,7 +256,7 @@ router.put('/:id', protect, asyncHandler(async (req, res, next) => {
   }
 
   // Check if user can modify this quote
-  if (existing.created_by !== req.user.id && !['admin', 'manager'].includes(req.user.role)) {
+  if (existing.created_by !== req.user!.id && !['admin', 'manager'].includes(req.user!.role)) {
     return next(createError('Not authorized to modify this quote', 403));
   }
 
@@ -335,7 +335,7 @@ router.put('/:id', protect, asyncHandler(async (req, res, next) => {
 // @desc    Delete quote
 // @route   DELETE /api/quotes/:id
 // @access  Private (Admin/Manager only)
-router.delete('/:id', protect, authorize('admin', 'manager'), asyncHandler(async (req, res, next) => {
+router.delete('/:id', protect, authorize('admin', 'manager'), asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction) => {
   // Check if quote exists
   const existing = await new Promise<any>((resolve, reject) => {
     db.get(
@@ -372,7 +372,7 @@ router.delete('/:id', protect, authorize('admin', 'manager'), asyncHandler(async
 // @desc    Add item to quote
 // @route   POST /api/quotes/:id/items
 // @access  Private
-router.post('/:id/items', protect, asyncHandler(async (req, res, next) => {
+router.post('/:id/items', protect, asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction) => {
   const { error, value } = quoteItemSchema.validate(req.body);
   if (error) {
     return next(createError(error.details[0].message, 400));
@@ -395,7 +395,7 @@ router.post('/:id/items', protect, asyncHandler(async (req, res, next) => {
   }
 
   // Check if user can modify this quote
-  if (quote.created_by !== req.user.id && !['admin', 'manager'].includes(req.user.role)) {
+  if (quote.created_by !== req.user!.id && !['admin', 'manager'].includes(req.user!.role)) {
     return next(createError('Not authorized to modify this quote', 403));
   }
 
@@ -463,7 +463,7 @@ router.post('/:id/items', protect, asyncHandler(async (req, res, next) => {
 // @desc    Update quote item
 // @route   PUT /api/quotes/:id/items/:itemId
 // @access  Private
-router.put('/:id/items/:itemId', protect, asyncHandler(async (req, res, next) => {
+router.put('/:id/items/:itemId', protect, asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction) => {
   const { error, value } = quoteItemSchema.validate(req.body);
   if (error) {
     return next(createError(error.details[0].message, 400));
@@ -530,7 +530,7 @@ router.put('/:id/items/:itemId', protect, asyncHandler(async (req, res, next) =>
 // @desc    Delete quote item
 // @route   DELETE /api/quotes/:id/items/:itemId
 // @access  Private
-router.delete('/:id/items/:itemId', protect, asyncHandler(async (req, res, next) => {
+router.delete('/:id/items/:itemId', protect, asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction) => {
   // Check if quote exists
   const quote = await new Promise<any>((resolve, reject) => {
     db.get(

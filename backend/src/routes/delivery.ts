@@ -1,6 +1,6 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import { db } from '../database/init';
-import { protect } from '../middleware/auth';
+import { protect, AuthRequest } from '../middleware/auth';
 import { asyncHandler, createError } from '../middleware/errorHandler';
 import Joi from 'joi';
 
@@ -44,7 +44,7 @@ const generateDeliveryNumber = async (): Promise<string> => {
 // @desc    Get all delivery notes
 // @route   GET /api/delivery
 // @access  Private
-router.get('/', protect, asyncHandler(async (req, res) => {
+router.get('/', protect, asyncHandler(async (req: AuthRequest, res: Response) => {
   const { page = 1, limit = 10, status, search } = req.query;
   const offset = (Number(page) - 1) * Number(limit);
 
@@ -110,7 +110,7 @@ router.get('/', protect, asyncHandler(async (req, res) => {
 // @desc    Get single delivery note
 // @route   GET /api/delivery/:id
 // @access  Private
-router.get('/:id', protect, asyncHandler(async (req, res, next) => {
+router.get('/:id', protect, asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction) => {
   const deliveryNote = await new Promise<any>((resolve, reject) => {
     db.get(
       `SELECT dn.*, p.name as project_name, u.first_name || ' ' || u.last_name as created_by_name 
@@ -158,7 +158,7 @@ router.get('/:id', protect, asyncHandler(async (req, res, next) => {
 // @desc    Create delivery note
 // @route   POST /api/delivery
 // @access  Private
-router.post('/', protect, asyncHandler(async (req, res, next) => {
+router.post('/', protect, asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction) => {
   const { error, value } = deliveryNoteSchema.validate(req.body);
   if (error) {
     return next(createError(error.details[0].message, 400));
@@ -194,7 +194,7 @@ router.post('/', protect, asyncHandler(async (req, res, next) => {
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         deliveryNumber, projectId, deliveryDate, deliveryAddress || null,
-        contactPerson || null, contactPhone || null, notes || null, status, req.user.id
+        contactPerson || null, contactPhone || null, notes || null, status, req.user!.id
       ],
       function(err) {
         if (err) reject(err);
@@ -228,7 +228,7 @@ router.post('/', protect, asyncHandler(async (req, res, next) => {
 // @desc    Update delivery note
 // @route   PUT /api/delivery/:id
 // @access  Private
-router.put('/:id', protect, asyncHandler(async (req, res, next) => {
+router.put('/:id', protect, asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction) => {
   const { error, value } = deliveryNoteSchema.validate(req.body);
   if (error) {
     return next(createError(error.details[0].message, 400));
@@ -296,7 +296,7 @@ router.put('/:id', protect, asyncHandler(async (req, res, next) => {
 // @desc    Add item to delivery note
 // @route   POST /api/delivery/:id/items
 // @access  Private
-router.post('/:id/items', protect, asyncHandler(async (req, res, next) => {
+router.post('/:id/items', protect, asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction) => {
   const { error, value } = deliveryItemSchema.validate(req.body);
   if (error) {
     return next(createError(error.details[0].message, 400));

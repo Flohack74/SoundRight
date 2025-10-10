@@ -1,10 +1,11 @@
 import express, { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import { db } from '../database/init';
 import { protect, AuthRequest } from '../middleware/auth';
 import { asyncHandler, createError } from '../middleware/errorHandler';
 import Joi from 'joi';
+import type { StringValue } from "ms";
 
 const router = express.Router();
 
@@ -29,9 +30,10 @@ const generateToken = (id: number): string => {
   if (!secret) {
     throw new Error('JWT_SECRET is not defined');
   }
-  return jwt.sign({ id }, secret, {
-    expiresIn: process.env.JWT_EXPIRES_IN || '7d'
-  });
+  const options: SignOptions = {
+    expiresIn: process.env.JWT_EXPIRES_IN as StringValue || "7d"
+  };
+  return jwt.sign({ id }, secret, options);
 };
 
 // @desc    Register user
@@ -162,7 +164,7 @@ router.get('/me', protect, asyncHandler(async (req: AuthRequest, res: Response) 
   const user = await new Promise<any>((resolve, reject) => {
     db.get(
       'SELECT id, username, email, first_name, last_name, role FROM users WHERE id = ?',
-      [req.user.id],
+      [req.user!.id],
       (err, row) => {
         if (err) reject(err);
         else resolve(row);
@@ -205,7 +207,7 @@ router.put('/updatepassword', protect, asyncHandler(async (req: AuthRequest, res
   const user = await new Promise<any>((resolve, reject) => {
     db.get(
       'SELECT password_hash FROM users WHERE id = ?',
-      [req.user.id],
+      [req.user!.id],
       (err, row) => {
         if (err) reject(err);
         else resolve(row);

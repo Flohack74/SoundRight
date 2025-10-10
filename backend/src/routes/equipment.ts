@@ -1,6 +1,6 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import { db } from '../database/init';
-import { protect, authorize } from '../middleware/auth';
+import { protect, authorize, AuthRequest } from '../middleware/auth';
 import { asyncHandler, createError } from '../middleware/errorHandler';
 import Joi from 'joi';
 
@@ -29,7 +29,7 @@ const equipmentSchema = Joi.object({
 // @desc    Get all equipment
 // @route   GET /api/equipment
 // @access  Private
-router.get('/', protect, asyncHandler(async (req, res) => {
+router.get('/', protect, asyncHandler(async (req: Request, res: Response) => {
   const { page = 1, limit = 10, category, condition, available, search } = req.query;
   const offset = (Number(page) - 1) * Number(limit);
 
@@ -99,7 +99,7 @@ router.get('/', protect, asyncHandler(async (req, res) => {
 // @desc    Get single equipment
 // @route   GET /api/equipment/:id
 // @access  Private
-router.get('/:id', protect, asyncHandler(async (req, res, next) => {
+router.get('/:id', protect, asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
   const equipment = await new Promise<any>((resolve, reject) => {
     db.get(
       'SELECT * FROM equipment WHERE id = ?',
@@ -124,7 +124,7 @@ router.get('/:id', protect, asyncHandler(async (req, res, next) => {
 // @desc    Create equipment
 // @route   POST /api/equipment
 // @access  Private (Admin/Manager only)
-router.post('/', protect, authorize('admin', 'manager'), asyncHandler(async (req, res, next) => {
+router.post('/', protect, authorize('admin', 'manager'), asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
   const { error, value } = equipmentSchema.validate(req.body);
   if (error) {
     return next(createError(error.details[0].message, 400));
@@ -196,7 +196,7 @@ router.post('/', protect, authorize('admin', 'manager'), asyncHandler(async (req
 // @desc    Update equipment
 // @route   PUT /api/equipment/:id
 // @access  Private (Admin/Manager only)
-router.put('/:id', protect, authorize('admin', 'manager'), asyncHandler(async (req, res, next) => {
+router.put('/:id', protect, authorize('admin', 'manager'), asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
   const { error, value } = equipmentSchema.validate(req.body);
   if (error) {
     return next(createError(error.details[0].message, 400));
@@ -286,7 +286,7 @@ router.put('/:id', protect, authorize('admin', 'manager'), asyncHandler(async (r
 // @desc    Delete equipment
 // @route   DELETE /api/equipment/:id
 // @access  Private (Admin only)
-router.delete('/:id', protect, authorize('admin'), asyncHandler(async (req, res, next) => {
+router.delete('/:id', protect, authorize('admin'), asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
   // Check if equipment exists
   const existing = await new Promise<any>((resolve, reject) => {
     db.get(
@@ -341,7 +341,7 @@ router.delete('/:id', protect, authorize('admin'), asyncHandler(async (req, res,
 // @desc    Get equipment categories
 // @route   GET /api/equipment/categories
 // @access  Private
-router.get('/meta/categories', protect, asyncHandler(async (req, res) => {
+router.get('/meta/categories', protect, asyncHandler(async (req: Request, res: Response) => {
   const categories = await new Promise<any[]>((resolve, reject) => {
     db.all(
       'SELECT DISTINCT category FROM equipment ORDER BY category',
@@ -362,7 +362,7 @@ router.get('/meta/categories', protect, asyncHandler(async (req, res) => {
 // @desc    Get equipment statistics
 // @route   GET /api/equipment/stats
 // @access  Private
-router.get('/meta/stats', protect, asyncHandler(async (req, res) => {
+router.get('/meta/stats', protect, asyncHandler(async (req: Request, res: Response) => {
   const stats = await new Promise<any>((resolve, reject) => {
     db.get(
       `SELECT 
