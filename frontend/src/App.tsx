@@ -5,7 +5,6 @@ import { Box } from '@mui/material';
 import { useAuth } from './contexts/AuthContext';
 import Layout from './components/Layout/Layout';
 import LoginPage from './pages/Auth/LoginPage';
-import RegisterPage from './pages/Auth/RegisterPage';
 import DashboardPage from './pages/Dashboard/DashboardPage';
 import EquipmentPage from './pages/Equipment/EquipmentPage';
 import ProjectsPage from './pages/Projects/ProjectsPage';
@@ -35,7 +34,6 @@ const App: React.FC = () => {
     return (
       <Routes>
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     );

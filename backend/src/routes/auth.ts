@@ -2,7 +2,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt, { SignOptions } from 'jsonwebtoken';
 import { db } from '../database/init';
-import { protect, AuthRequest } from '../middleware/auth';
+import { protect, authorize, AuthRequest } from '../middleware/auth';
 import { asyncHandler, createError } from '../middleware/errorHandler';
 import Joi from 'joi';
 import type { StringValue } from "ms";
@@ -38,8 +38,8 @@ const generateToken = (id: number): string => {
 
 // @desc    Register user
 // @route   POST /api/auth/register
-// @access  Public
-router.post('/register', asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+// @access  Private (Admin only)
+router.post('/register', protect, authorize('admin'), asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction) => {
   const { error, value } = registerSchema.validate(req.body);
   if (error) {
     return next(createError(error.details[0].message, 400));
@@ -94,7 +94,7 @@ router.post('/register', asyncHandler(async (req: Request, res: Response, next: 
 
   res.status(201).json({
     success: true,
-    token: generateToken(user.id),
+    message: 'User created successfully',
     user: {
       id: user.id,
       username: user.username,

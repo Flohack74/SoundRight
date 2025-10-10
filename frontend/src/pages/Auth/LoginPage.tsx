@@ -116,9 +116,9 @@ const LoginPage: React.FC = () => {
                 {loading ? 'Signing In...' : 'Sign In'}
               </Button>
               <Box sx={{ textAlign: 'center' }}>
-                <Link component={RouterLink} to="/register" variant="body2">
-                  Don't have an account? Sign Up
-                </Link>
+                <Typography variant="body2" color="text.secondary">
+                  Contact your administrator for account access
+                </Typography>
               </Box>
             </Box>
           </CardContent>

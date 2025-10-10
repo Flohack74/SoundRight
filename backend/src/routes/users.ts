@@ -6,6 +6,20 @@ import Joi from 'joi';
 
 const router = express.Router();
 
+// Helper function to convert snake_case to camelCase
+const toCamelCase = (obj: any): any => {
+  if (!obj || typeof obj !== 'object') return obj;
+  
+  const camelObj: any = {};
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      const camelKey = key.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
+      camelObj[camelKey] = obj[key];
+    }
+  }
+  return camelObj;
+};
+
 // Validation schemas
 const updateUserSchema = Joi.object({
   username: Joi.string().alphanum().min(3).max(30),
@@ -78,12 +92,7 @@ router.get('/', protect, authorize('admin', 'manager'), asyncHandler(async (req:
       limit: Number(limit),
       totalPages: Math.ceil(totalCount / Number(limit))
     },
-    data: users.map(user => ({
-      ...user,
-      firstName: user.first_name,
-      lastName: user.last_name,
-      isActive: Boolean(user.is_active)
-    }))
+    data: users.map(toCamelCase)
   });
 }));
 
@@ -108,12 +117,7 @@ router.get('/:id', protect, authorize('admin', 'manager'), asyncHandler(async (r
 
   res.json({
     success: true,
-    data: {
-      ...user,
-      firstName: user.first_name,
-      lastName: user.last_name,
-      isActive: Boolean(user.is_active)
-    }
+    data: toCamelCase(user)
   });
 }));
 
@@ -237,12 +241,7 @@ router.put('/:id', protect, authorize('admin', 'manager'), asyncHandler(async (r
 
   res.json({
     success: true,
-    data: {
-      ...updatedUser,
-      firstName: updatedUser.first_name,
-      lastName: updatedUser.last_name,
-      isActive: Boolean(updatedUser.is_active)
-    }
+    data: toCamelCase(updatedUser)
   });
 }));
 
