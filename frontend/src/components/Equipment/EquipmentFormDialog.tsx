@@ -43,8 +43,8 @@ const EquipmentFormDialog: React.FC<EquipmentFormDialogProps> = ({
     description: '',
     specifications: '',
     purchaseDate: '',
-    purchasePrice: undefined,
-    currentValue: undefined,
+    purchasePrice: 0,
+    currentValue: 0,
     conditionStatus: 'good',
     location: '',
     isAvailable: true,
@@ -67,11 +67,11 @@ const EquipmentFormDialog: React.FC<EquipmentFormDialogProps> = ({
         description: equipment.description || '',
         specifications: equipment.specifications || '',
         purchaseDate: equipment.purchaseDate ? equipment.purchaseDate.split('T')[0] : '',
-        purchasePrice: equipment.purchasePrice,
-        currentValue: equipment.currentValue,
+        purchasePrice: equipment.purchasePrice ?? 0,
+        currentValue: equipment.currentValue ?? 0,
         conditionStatus: equipment.conditionStatus,
         location: equipment.location || '',
-        isAvailable: equipment.isAvailable,
+        isAvailable: equipment.isAvailable ?? true,
         maintenanceNotes: equipment.maintenanceNotes || '',
         lastMaintenance: equipment.lastMaintenance ? equipment.lastMaintenance.split('T')[0] : '',
         nextMaintenance: equipment.nextMaintenance ? equipment.nextMaintenance.split('T')[0] : '',
@@ -87,8 +87,8 @@ const EquipmentFormDialog: React.FC<EquipmentFormDialogProps> = ({
         description: '',
         specifications: '',
         purchaseDate: '',
-        purchasePrice: undefined,
-        currentValue: undefined,
+        purchasePrice: 0,
+        currentValue: 0,
         conditionStatus: 'good',
         location: '',
         isAvailable: true,
@@ -151,7 +151,10 @@ const EquipmentFormDialog: React.FC<EquipmentFormDialogProps> = ({
         description: formData.description || undefined,
         specifications: formData.specifications || undefined,
         purchaseDate: formData.purchaseDate || undefined,
+        purchasePrice: formData.purchasePrice ?? 0,
+        currentValue: formData.currentValue ?? 0,
         location: formData.location || undefined,
+        isAvailable: formData.isAvailable ?? true,
         maintenanceNotes: formData.maintenanceNotes || undefined,
         lastMaintenance: formData.lastMaintenance || undefined,
         nextMaintenance: formData.nextMaintenance || undefined,
@@ -287,14 +290,15 @@ const EquipmentFormDialog: React.FC<EquipmentFormDialogProps> = ({
               fullWidth
               label="Purchase Price"
               type="number"
-              value={formData.purchasePrice ?? ''}
-              onChange={(e) => handleChange('purchasePrice', e.target.value ? parseFloat(e.target.value) : undefined)}
+              value={formData.purchasePrice ?? 0}
+              onChange={(e) => handleChange('purchasePrice', e.target.value ? parseFloat(e.target.value) : 0)}
               error={!!errors.purchasePrice}
               helperText={errors.purchasePrice}
               disabled={loading}
               InputProps={{
                 startAdornment: <InputAdornment position="start">$</InputAdornment>,
               }}
+              inputProps={{ min: 0, step: 0.01 }}
             />
           </Grid>
           <Grid item xs={12} sm={4}>
@@ -302,14 +306,15 @@ const EquipmentFormDialog: React.FC<EquipmentFormDialogProps> = ({
               fullWidth
               label="Current Value"
               type="number"
-              value={formData.currentValue ?? ''}
-              onChange={(e) => handleChange('currentValue', e.target.value ? parseFloat(e.target.value) : undefined)}
+              value={formData.currentValue ?? 0}
+              onChange={(e) => handleChange('currentValue', e.target.value ? parseFloat(e.target.value) : 0)}
               error={!!errors.currentValue}
               helperText={errors.currentValue}
               disabled={loading}
               InputProps={{
                 startAdornment: <InputAdornment position="start">$</InputAdornment>,
               }}
+              inputProps={{ min: 0, step: 0.01 }}
             />
           </Grid>
 
