@@ -27,7 +27,13 @@ class ApiService {
     this.api.interceptors.response.use(
       (response) => response,
       (error) => {
-        if (error.response?.status === 401) {
+        // Don't auto-logout for certain auth endpoints that return 401 for validation errors
+        const authEndpointsToSkip = ['/auth/updatepassword', '/auth/profile'];
+        const shouldSkipAutoLogout = authEndpointsToSkip.some(endpoint => 
+          error.config?.url?.includes(endpoint)
+        );
+        
+        if (error.response?.status === 401 && !shouldSkipAutoLogout) {
           localStorage.removeItem('token');
           window.location.href = '/login';
         }
