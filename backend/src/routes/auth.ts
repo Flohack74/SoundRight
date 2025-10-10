@@ -243,4 +243,100 @@ router.put('/updatepassword', protect, asyncHandler(async (req: AuthRequest, res
   });
 }));
 
+// @desc    Update user profile
+// @route   PUT /api/auth/profile
+// @access  Private
+router.put('/profile', protect, asyncHandler(async (req: AuthRequest, res: Response, next: NextFunction) => {
+  if (!req.user) {
+    return next(createError('User not authenticated', 401));
+  }
+  
+  const { username, email, firstName, lastName } = req.body;
+
+  // Validate required fields
+  if (!username || !email || !firstName || !lastName) {
+    return next(createError('All fields are required', 400));
+  }
+
+  // Validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return next(createError('Please provide a valid email address', 400));
+  }
+
+  // Validate username
+  if (username.length < 3 || username.length > 30) {
+    return next(createError('Username must be between 3 and 30 characters', 400));
+  }
+
+  // Check for duplicate username (excluding current user)
+  const duplicateUsername = await new Promise<any>((resolve, reject) => {
+    db.get(
+      'SELECT id FROM users WHERE username = ? AND id != ?',
+      [username, req.user!.id],
+      (err, row) => {
+        if (err) reject(err);
+        else resolve(row);
+      }
+    );
+  });
+
+  if (duplicateUsername) {
+    return next(createError('Username already exists', 400));
+  }
+
+  // Check for duplicate email (excluding current user)
+  const duplicateEmail = await new Promise<any>((resolve, reject) => {
+    db.get(
+      'SELECT id FROM users WHERE email = ? AND id != ?',
+      [email, req.user!.id],
+      (err, row) => {
+        if (err) reject(err);
+        else resolve(row);
+      }
+    );
+  });
+
+  if (duplicateEmail) {
+    return next(createError('Email already exists', 400));
+  }
+
+  // Update user profile
+  await new Promise((resolve, reject) => {
+    db.run(
+      'UPDATE users SET username = ?, email = ?, first_name = ?, last_name = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+      [username, email, firstName, lastName, req.user!.id],
+      (err) => {
+        if (err) reject(err);
+        else resolve(null);
+      }
+    );
+  });
+
+  // Get updated user
+  const updatedUser = await new Promise<any>((resolve, reject) => {
+    db.get(
+      'SELECT id, username, email, first_name, last_name, role FROM users WHERE id = ?',
+      [req.user!.id],
+      (err, row) => {
+        if (err) reject(err);
+        else resolve(row);
+      }
+    );
+  });
+
+  res.json({
+    success: true,
+    message: 'Profile updated successfully',
+    user: {
+      id: updatedUser.id,
+      username: updatedUser.username,
+      email: updatedUser.email,
+      firstName: updatedUser.first_name,
+      lastName: updatedUser.last_name,
+      role: updatedUser.role
+    }
+  });
+}));
+
 export default router;

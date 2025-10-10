@@ -9,6 +9,7 @@ interface AuthContextType {
   register: (userData: RegisterData) => Promise<void>;
   logout: () => void;
   updatePassword: (currentPassword: string, newPassword: string) => Promise<void>;
+  updateProfile: (profileData: { username: string; email: string; firstName: string; lastName: string }) => Promise<void>;
 }
 
 interface RegisterData {
@@ -89,6 +90,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const updateProfile = async (profileData: { username: string; email: string; firstName: string; lastName: string }) => {
+    try {
+      const updatedUser = await authService.updateProfile(profileData);
+      setUser(updatedUser);
+    } catch (error) {
+      throw error;
+    }
+  };
+
   const value: AuthContextType = {
     user,
     loading,
@@ -96,6 +106,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     register,
     logout,
     updatePassword,
+    updateProfile,
   };
 
   return (

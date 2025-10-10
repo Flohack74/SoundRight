@@ -20,6 +20,11 @@ class AuthService {
     const updateData: UpdatePasswordRequest = { currentPassword, newPassword };
     await apiService.put('/auth/updatepassword', updateData);
   }
+
+  async updateProfile(profileData: { username: string; email: string; firstName: string; lastName: string }): Promise<User> {
+    const response = await apiService.put<{ success: boolean; message: string; user: User }>('/auth/profile', profileData);
+    return response.user;
+  }
 }
 
 export const authService = new AuthService();
