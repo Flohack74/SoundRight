@@ -19,6 +19,15 @@ import {
   InputLabel,
   Select,
   Pagination,
+  ToggleButton,
+  ToggleButtonGroup,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
 } from '@mui/material';
 import {
   Add,
@@ -28,6 +37,8 @@ import {
   Visibility,
   Search,
   FilterList,
+  ViewModule,
+  ViewList,
 } from '@mui/icons-material';
 import { useSnackbar } from '../../contexts/SnackbarContext';
 import { equipmentService } from '../../services/equipmentService';
@@ -52,6 +63,7 @@ const EquipmentPage: React.FC = () => {
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
   const [editingEquipment, setEditingEquipment] = useState<Equipment | null>(null);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   const { showSuccess, showError } = useSnackbar();
 
@@ -175,13 +187,32 @@ const EquipmentPage: React.FC = () => {
         <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold' }}>
           Equipment Inventory
         </Typography>
-        <Button
-          variant="contained"
-          startIcon={<Add />}
-          onClick={handleAddClick}
-        >
-          Add Equipment
-        </Button>
+        <Box display="flex" gap={2} alignItems="center">
+          <ToggleButtonGroup
+            value={viewMode}
+            exclusive
+            onChange={(e, newMode) => {
+              if (newMode !== null) {
+                setViewMode(newMode);
+              }
+            }}
+            size="small"
+          >
+            <ToggleButton value="grid" aria-label="grid view">
+              <ViewModule />
+            </ToggleButton>
+            <ToggleButton value="list" aria-label="list view">
+              <ViewList />
+            </ToggleButton>
+          </ToggleButtonGroup>
+          <Button
+            variant="contained"
+            startIcon={<Add />}
+            onClick={handleAddClick}
+          >
+            Add Equipment
+          </Button>
+        </Box>
       </Box>
 
       {/* Filters */}
@@ -254,72 +285,159 @@ const EquipmentPage: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Equipment Grid */}
+      {/* Equipment Display */}
       {loading ? (
         <LoadingSpinner message="Loading equipment..." />
       ) : (
         <>
-          <Grid container spacing={3}>
-            {equipment.map((item) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={item.id}>
-                <Card
-                  sx={{
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    transition: 'transform 0.2s, box-shadow 0.2s',
-                    '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: 4,
-                    },
-                  }}
-                >
-                  <CardContent sx={{ flexGrow: 1 }}>
-                    <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
-                      <Typography variant="h6" component="h2" noWrap>
-                        {item.name}
-                      </Typography>
-                      <IconButton
-                        size="small"
-                        onClick={(e) => handleMenuOpen(e, item)}
-                      >
-                        <MoreVert />
-                      </IconButton>
-                    </Box>
-                    
-                    <Typography variant="body2" color="text.secondary" gutterBottom>
-                      {item.category}
-                    </Typography>
-                    
-                    {item.brand && item.model && (
+          {viewMode === 'grid' ? (
+            /* Grid View */
+            <Grid container spacing={3}>
+              {equipment.map((item) => (
+                <Grid item xs={12} sm={6} md={4} lg={3} key={item.id}>
+                  <Card
+                    sx={{
+                      height: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      transition: 'transform 0.2s, box-shadow 0.2s',
+                      '&:hover': {
+                        transform: 'translateY(-4px)',
+                        boxShadow: 4,
+                      },
+                    }}
+                  >
+                    <CardContent sx={{ flexGrow: 1 }}>
+                      <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
+                        <Typography variant="h6" component="h2" noWrap>
+                          {item.name}
+                        </Typography>
+                        <IconButton
+                          size="small"
+                          onClick={(e) => handleMenuOpen(e, item)}
+                        >
+                          <MoreVert />
+                        </IconButton>
+                      </Box>
+                      
                       <Typography variant="body2" color="text.secondary" gutterBottom>
-                        {item.brand} {item.model}
+                        {item.category}
                       </Typography>
-                    )}
-                    
-                    <Box display="flex" gap={1} mb={2}>
-                      <Chip
-                        label={item.conditionStatus}
-                        color={getConditionColor(item.conditionStatus) as any}
-                        size="small"
-                      />
-                      <Chip
-                        label={item.isAvailable ? 'Available' : 'Allocated'}
-                        color={item.isAvailable ? 'success' : 'warning'}
-                        size="small"
-                      />
-                    </Box>
-                    
-                    {item.location && (
-                      <Typography variant="body2" color="text.secondary">
-                        Location: {item.location}
-                      </Typography>
-                    )}
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
+                      
+                      {item.brand && item.model && (
+                        <Typography variant="body2" color="text.secondary" gutterBottom>
+                          {item.brand} {item.model}
+                        </Typography>
+                      )}
+                      
+                      <Box display="flex" gap={1} mb={2}>
+                        <Chip
+                          label={item.conditionStatus}
+                          color={getConditionColor(item.conditionStatus) as any}
+                          size="small"
+                        />
+                        <Chip
+                          label={item.isAvailable ? 'Available' : 'Allocated'}
+                          color={item.isAvailable ? 'success' : 'warning'}
+                          size="small"
+                        />
+                      </Box>
+                      
+                      {item.location && (
+                        <Typography variant="body2" color="text.secondary">
+                          Location: {item.location}
+                        </Typography>
+                      )}
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          ) : (
+            /* List View */
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Name</TableCell>
+                    <TableCell>Category</TableCell>
+                    <TableCell>Brand/Model</TableCell>
+                    <TableCell>Serial Number</TableCell>
+                    <TableCell>Condition</TableCell>
+                    <TableCell>Availability</TableCell>
+                    <TableCell>Location</TableCell>
+                    <TableCell align="right">Actions</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {equipment.map((item) => (
+                    <TableRow key={item.id} hover>
+                      <TableCell>
+                        <Typography variant="body2" fontWeight="medium">
+                          {item.name}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>{item.category}</TableCell>
+                      <TableCell>
+                        {item.brand && item.model ? (
+                          `${item.brand} ${item.model}`
+                        ) : (
+                          <Typography variant="body2" color="text.secondary">
+                            N/A
+                          </Typography>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {item.serialNumber || (
+                          <Typography variant="body2" color="text.secondary">
+                            N/A
+                          </Typography>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label={item.conditionStatus}
+                          color={getConditionColor(item.conditionStatus) as any}
+                          size="small"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label={item.isAvailable ? 'Available' : 'Allocated'}
+                          color={item.isAvailable ? 'success' : 'warning'}
+                          size="small"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        {item.location || (
+                          <Typography variant="body2" color="text.secondary">
+                            N/A
+                          </Typography>
+                        )}
+                      </TableCell>
+                      <TableCell align="right">
+                        <IconButton
+                          size="small"
+                          onClick={(e) => handleMenuOpen(e, item)}
+                        >
+                          <MoreVert />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {equipment.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={8} align="center">
+                        <Typography variant="body2" color="text.secondary">
+                          No equipment found
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
 
           {/* Pagination */}
           {totalPages > 1 && (
