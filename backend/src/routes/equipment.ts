@@ -6,6 +6,20 @@ import Joi from 'joi';
 
 const router = express.Router();
 
+// Helper function to convert snake_case to camelCase
+const toCamelCase = (obj: any): any => {
+  if (!obj || typeof obj !== 'object') return obj;
+  
+  const camelObj: any = {};
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      const camelKey = key.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
+      camelObj[camelKey] = obj[key];
+    }
+  }
+  return camelObj;
+};
+
 // Validation schemas
 const equipmentSchema = Joi.object({
   name: Joi.string().min(1).max(100).required(),
@@ -92,7 +106,7 @@ router.get('/', protect, asyncHandler(async (req: Request, res: Response) => {
       limit: Number(limit),
       totalPages: Math.ceil(totalCount / Number(limit))
     },
-    data: equipment
+    data: equipment.map(toCamelCase)
   });
 }));
 
@@ -117,7 +131,7 @@ router.get('/:id', protect, asyncHandler(async (req: Request, res: Response, nex
 
   res.json({
     success: true,
-    data: equipment
+    data: toCamelCase(equipment)
   });
 }));
 
@@ -189,7 +203,7 @@ router.post('/', protect, authorize('admin', 'manager'), asyncHandler(async (req
 
   res.status(201).json({
     success: true,
-    data: newEquipment
+    data: toCamelCase(newEquipment)
   });
 }));
 
@@ -279,7 +293,7 @@ router.put('/:id', protect, authorize('admin', 'manager'), asyncHandler(async (r
 
   res.json({
     success: true,
-    data: updatedEquipment
+    data: toCamelCase(updatedEquipment)
   });
 }));
 

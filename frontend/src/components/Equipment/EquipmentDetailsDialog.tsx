@@ -44,7 +44,8 @@ const EquipmentDetailsDialog: React.FC<EquipmentDetailsDialogProps> = ({
     }).format(value);
   };
 
-  const getConditionColor = (condition: string) => {
+  const getConditionColor = (condition?: string) => {
+    if (!condition) return 'default';
     switch (condition) {
       case 'excellent':
         return 'success';
@@ -59,6 +60,11 @@ const EquipmentDetailsDialog: React.FC<EquipmentDetailsDialogProps> = ({
       default:
         return 'default';
     }
+  };
+
+  const formatConditionStatus = (status?: string): string => {
+    if (!status) return 'N/A';
+    return status.charAt(0).toUpperCase() + status.slice(1);
   };
 
   const DetailRow: React.FC<{ label: string; value: string | React.ReactNode }> = ({ label, value }) => (
@@ -121,7 +127,7 @@ const EquipmentDetailsDialog: React.FC<EquipmentDetailsDialogProps> = ({
                   Condition
                 </Typography>
                 <Chip
-                  label={equipment.conditionStatus.charAt(0).toUpperCase() + equipment.conditionStatus.slice(1)}
+                  label={formatConditionStatus(equipment.conditionStatus)}
                   color={getConditionColor(equipment.conditionStatus) as any}
                   size="small"
                 />
@@ -133,7 +139,7 @@ const EquipmentDetailsDialog: React.FC<EquipmentDetailsDialogProps> = ({
                   Availability
                 </Typography>
                 <Chip
-                  label={equipment.isAvailable ? 'Available' : 'Allocated'}
+                  label={equipment.isAvailable !== undefined ? (equipment.isAvailable ? 'Available' : 'Allocated') : 'N/A'}
                   color={equipment.isAvailable ? 'success' : 'warning'}
                   size="small"
                 />
