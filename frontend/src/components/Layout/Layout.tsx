@@ -21,6 +21,7 @@ import {
 import {
   Menu as MenuIcon,
   Dashboard,
+  Business,
   Inventory,
   Assignment,
   Receipt,
@@ -42,6 +43,7 @@ interface LayoutProps {
 
 const menuItems = [
   { text: 'Dashboard', icon: <Dashboard />, path: '/dashboard' },
+  { text: 'Customers', icon: <Business />, path: '/customers' },
   { text: 'Equipment', icon: <Inventory />, path: '/equipment' },
   { text: 'Projects', icon: <Assignment />, path: '/projects' },
   { text: 'Quotes', icon: <Receipt />, path: '/quotes' },

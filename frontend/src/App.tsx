@@ -6,6 +6,7 @@ import { useAuth } from './contexts/AuthContext';
 import Layout from './components/Layout/Layout';
 import LoginPage from './pages/Auth/LoginPage';
 import DashboardPage from './pages/Dashboard/DashboardPage';
+import CustomersPage from './pages/Customers/CustomersPage';
 import EquipmentPage from './pages/Equipment/EquipmentPage';
 import ProjectsPage from './pages/Projects/ProjectsPage';
 import QuotesPage from './pages/Quotes/QuotesPage';
@@ -44,6 +45,7 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/customers" element={<CustomersPage />} />
         <Route path="/equipment" element={<EquipmentPage />} />
         <Route path="/projects" element={<ProjectsPage />} />
         <Route path="/quotes" element={<QuotesPage />} />

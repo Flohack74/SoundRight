@@ -24,6 +24,7 @@ export const initializeDatabase = () => {
 
   // Create tables
   createUsersTable();
+  createCustomersTable();
   createEquipmentTable();
   createProjectsTable();
   createProjectEquipmentTable();
@@ -47,6 +48,29 @@ const createUsersTable = () => {
       first_name VARCHAR(50) NOT NULL,
       last_name VARCHAR(50) NOT NULL,
       role VARCHAR(20) DEFAULT 'user' CHECK (role IN ('admin', 'user', 'manager')),
+      is_active BOOLEAN DEFAULT 1,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `;
+  db.run(sql);
+};
+
+const createCustomersTable = () => {
+  const sql = `
+    CREATE TABLE IF NOT EXISTS customers (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      company_name VARCHAR(100) NOT NULL,
+      contact_person VARCHAR(100),
+      email VARCHAR(100) NOT NULL,
+      phone VARCHAR(20) NOT NULL,
+      address TEXT NOT NULL,
+      city VARCHAR(50),
+      state VARCHAR(50),
+      postal_code VARCHAR(20) NOT NULL,
+      country VARCHAR(50),
+      tax_id VARCHAR(50),
+      notes TEXT,
       is_active BOOLEAN DEFAULT 1,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP

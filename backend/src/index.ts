@@ -12,6 +12,7 @@ import { notFound } from './middleware/notFound';
 
 // Import routes
 import authRoutes from './routes/auth';
+import customerRoutes from './routes/customers';
 import equipmentRoutes from './routes/equipment';
 import projectRoutes from './routes/projects';
 import quoteRoutes from './routes/quotes';
@@ -52,6 +53,7 @@ initializeDatabase();
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/customers', customerRoutes);
 app.use('/api/equipment', equipmentRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/quotes', quoteRoutes);
