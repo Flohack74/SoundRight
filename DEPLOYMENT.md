@@ -197,7 +197,8 @@ Add the following content (replace `yourdomain.com` with your actual domain):
     Header always set X-Frame-Options DENY
     Header always set X-XSS-Protection "1; mode=block"
     Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
-    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://yourdomain.com;"
+    # Note: Replace https://yourdomain.com with your actual API backend URL
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' http://localhost:5000 https://yourdomain.com;"
     
     # Serve React App
     <Directory "/var/www/SoundRight/frontend/build">
