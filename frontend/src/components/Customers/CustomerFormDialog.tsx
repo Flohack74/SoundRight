@@ -154,7 +154,7 @@ const CustomerFormDialog: React.FC<CustomerFormDialogProps> = ({
       onSuccess();
       onClose();
     } catch (error: any) {
-      showError(error.response?.data?.message || `Failed to ${customer ? 'update' : 'create'} customer`);
+      showError(error.response?.data?.error || `Failed to ${customer ? 'update' : 'create'} customer`);
     } finally {
       setLoading(false);
     }

@@ -141,7 +141,7 @@ const UsersPage: React.FC = () => {
       showSuccess('User deleted successfully');
       fetchUsers();
     } catch (error: any) {
-      showError(error.response?.data?.message || 'Failed to delete user');
+      showError(error.response?.data?.error || 'Failed to delete user');
     } finally {
       setDeleteDialogOpen(false);
       handleMenuClose();

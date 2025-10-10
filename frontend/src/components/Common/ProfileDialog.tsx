@@ -71,6 +71,12 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
         firstName: user.firstName || '',
         lastName: user.lastName || '',
       });
+      // Reset password fields when dialog opens
+      setPasswordData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      });
     }
   }, [user, open]);
 
@@ -138,7 +144,7 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
       showSuccess('Profile updated successfully');
       onClose();
     } catch (error: any) {
-      showError(error.response?.data?.message || 'Failed to update profile');
+      showError(error.response?.data?.error || 'Failed to update profile');
     } finally {
       setLoading(false);
     }
@@ -160,7 +166,7 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
       });
       onClose();
     } catch (error: any) {
-      showError(error.response?.data?.message || 'Failed to update password');
+      showError(error.response?.data?.error || 'Failed to update password');
     } finally {
       setLoading(false);
     }
@@ -261,6 +267,7 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
               error={!!errors.currentPassword}
               helperText={errors.currentPassword}
               fullWidth
+              autoComplete="off"
             />
             <TextField
               label="New Password"
@@ -272,6 +279,7 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
               error={!!errors.newPassword}
               helperText={errors.newPassword}
               fullWidth
+              autoComplete="new-password"
             />
             <TextField
               label="Confirm New Password"
@@ -283,6 +291,7 @@ const ProfileDialog: React.FC<ProfileDialogProps> = ({ open, onClose }) => {
               error={!!errors.confirmPassword}
               helperText={errors.confirmPassword}
               fullWidth
+              autoComplete="new-password"
             />
             <Alert severity="warning" sx={{ mt: 1 }}>
               Make sure to choose a strong password that you haven't used before.

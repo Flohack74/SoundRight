@@ -173,7 +173,7 @@ const EquipmentFormDialog: React.FC<EquipmentFormDialogProps> = ({
       onSuccess();
       onClose();
     } catch (error: any) {
-      showError(error.response?.data?.message || `Failed to ${equipment ? 'update' : 'create'} equipment`);
+      showError(error.response?.data?.error || `Failed to ${equipment ? 'update' : 'create'} equipment`);
     } finally {
       setLoading(false);
     }

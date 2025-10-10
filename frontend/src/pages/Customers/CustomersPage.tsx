@@ -141,7 +141,7 @@ const CustomersPage: React.FC = () => {
       showSuccess('Customer deleted successfully');
       fetchCustomers();
     } catch (error: any) {
-      showError(error.response?.data?.message || 'Failed to delete customer');
+      showError(error.response?.data?.error || 'Failed to delete customer');
     } finally {
       setDeleteDialogOpen(false);
       handleMenuClose();
