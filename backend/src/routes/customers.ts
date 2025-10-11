@@ -14,7 +14,15 @@ const toCamelCase = (obj: any): any => {
   for (const key in obj) {
     if (obj.hasOwnProperty(key)) {
       const camelKey = key.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
-      camelObj[camelKey] = obj[key];
+      let value = obj[key];
+      // Convert numeric booleans for specific fields
+      if (
+        (camelKey === 'isActive' || camelKey === 'isAvailable') &&
+        (value === 0 || value === 1)
+      ) {
+        value = Boolean(value);
+      }
+      camelObj[camelKey] = value;
     }
   }
   return camelObj;
