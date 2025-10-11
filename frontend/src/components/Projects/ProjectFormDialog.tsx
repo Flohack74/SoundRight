@@ -344,7 +344,7 @@ const ProjectFormDialog: React.FC<ProjectFormDialogProps> = ({
               <Grid item xs={12} sm={6}>
                 <DatePicker
                   label="Start Date"
-                  value={formData.startDate ? new Date(formData.startDate) : null}
+                  value={formData.startDate ? new Date(formData.startDate + 'T00:00:00') : null}
                   onChange={(date) => setFormData({ ...formData, startDate: date ? date.toISOString().split('T')[0] : '' })}
                   slotProps={{
                     textField: {
@@ -360,7 +360,7 @@ const ProjectFormDialog: React.FC<ProjectFormDialogProps> = ({
               <Grid item xs={12} sm={6}>
                 <DatePicker
                   label="End Date"
-                  value={formData.endDate ? new Date(formData.endDate) : null}
+                  value={formData.endDate ? new Date(formData.endDate + 'T00:00:00') : null}
                   onChange={(date) => setFormData({ ...formData, endDate: date ? date.toISOString().split('T')[0] : '' })}
                   slotProps={{
                     textField: {
