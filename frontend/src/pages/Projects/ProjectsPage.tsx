@@ -165,7 +165,7 @@ const ProjectsPage: React.FC = () => {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString();
+    return new Date(dateString + 'T00:00:00').toLocaleDateString();
   };
 
   if (loading) {

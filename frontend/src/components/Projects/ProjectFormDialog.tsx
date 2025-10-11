@@ -156,7 +156,7 @@ const ProjectFormDialog: React.FC<ProjectFormDialogProps> = ({
       newErrors.endDate = 'End date is required';
     }
 
-    if (formData.startDate && formData.endDate && new Date(formData.startDate) >= new Date(formData.endDate)) {
+    if (formData.startDate && formData.endDate && new Date(formData.startDate + 'T00:00:00') >= new Date(formData.endDate + 'T00:00:00')) {
       newErrors.endDate = 'End date must be after start date';
     }
 
